@@ -6,8 +6,8 @@ out
 .DS_Store
 
 # Optional local artifacts
-reports
-data
+/reports
+/data
 
 # Local runtime artifacts
 tmp
