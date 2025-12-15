@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+.env
+.env.local
+.DS_Store
+
+# Optional local artifacts
+reports
+data
+
+# Local runtime artifacts
+tmp
+tsconfig.tsbuildinfo

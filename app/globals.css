@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --pastel-sky: #dbeafe;
+  --pastel-mint: #d1fae5;
+  --pastel-peach: #ffedd5;
+  --pastel-lilac: #ede9fe;
+  --ink: #0f172a;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 10% 10%, var(--pastel-mint), transparent 60%),
+    radial-gradient(1000px 700px at 90% 30%, var(--pastel-lilac), transparent 55%),
+    radial-gradient(900px 600px at 40% 90%, var(--pastel-peach), transparent 60%),
+    linear-gradient(180deg, #ffffff, var(--pastel-sky));
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+}
+
