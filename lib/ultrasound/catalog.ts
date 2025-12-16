@@ -8,6 +8,7 @@ export type UltrasoundType =
   | "neck"
   | "thyroid"
   | "female_pelvis"
+  | "male_genital_scrotum"
   | "adrenal_kidney_bladder"
   | "ihps";
 
@@ -21,6 +22,7 @@ export const ULTRASOUND_TYPES: Array<{ value: UltrasoundType; label: string }> =
   { value: "neck", label: "경부 초음파" },
   { value: "thyroid", label: "갑상선 초음파" },
   { value: "female_pelvis", label: "여성 생식기 (난소, 자궁) 초음파" },
+  { value: "male_genital_scrotum", label: "남성 생식기 (음낭) 초음파" },
   { value: "adrenal_kidney_bladder", label: "부신-신장-방광 초음파" },
   { value: "ihps", label: "IHPS 초음파" }
 ];
@@ -46,6 +48,8 @@ const normalFindingsByType: Record<UltrasoundType, string> = {
     "Thyroid gland normal in size and echotexture. No discrete thyroid nodule. No suspicious cervical lymphadenopathy.",
   female_pelvis:
     "Uterus and ovaries demonstrate age-appropriate appearance. No adnexal mass. No sonographic evidence of torsion. No free pelvic fluid.",
+  male_genital_scrotum:
+    "Both testes are normal in size and echogenicity. No focal testicular lesion. Epididymides are unremarkable. No hydrocele or varicocele. Color Doppler flow is symmetric and preserved.",
   adrenal_kidney_bladder:
     "Adrenal glands without focal mass. Both kidneys normal in size without hydronephrosis. No focal renal lesion. Urinary bladder unremarkable without wall thickening or debris.",
   ihps:
@@ -62,6 +66,7 @@ const defaultImpressionByType: Record<UltrasoundType, string> = {
   neck: "No focal neck abnormality identified on this exam.",
   thyroid: "Unremarkable thyroid ultrasound.",
   female_pelvis: "Unremarkable pelvic ultrasound.",
+  male_genital_scrotum: "Unremarkable scrotal ultrasound.",
   adrenal_kidney_bladder: "Unremarkable adrenal, renal, and bladder ultrasound.",
   ihps: "No sonographic evidence of hypertrophic pyloric stenosis."
 };
@@ -147,6 +152,15 @@ const abnormalTilesByType: Record<UltrasoundType, AbnormalTile[]> = {
     { id: "free_fluid", title: "Free fluid", text: "Free pelvic fluid is present." },
     { id: "uterine", title: "Uterine abnormality", text: "Uterus demonstrates an abnormal appearance; correlate clinically." },
     { id: "pyo", title: "Inflammation", text: "Findings suggest pelvic inflammatory process; correlate clinically." }
+  ],
+  male_genital_scrotum: [
+    { id: "hydrocele", title: "Hydrocele", text: "Hydrocele is present." },
+    { id: "varicocele", title: "Varicocele", text: "Varicocele is present." },
+    { id: "epididymitis", title: "Epididymitis", text: "Enlarged epididymis with hyperemia suggests epididymitis." },
+    { id: "orchitis", title: "Orchitis", text: "Enlarged testis with hyperemia suggests orchitis." },
+    { id: "torsion", title: "Torsion", text: "Decreased/absent testicular flow is concerning for torsion; urgent urologic evaluation is recommended." },
+    { id: "mass", title: "Mass", text: "A focal testicular lesion is identified; correlation and follow-up are recommended." },
+    { id: "hernia", title: "Inguinal hernia", text: "Hernia containing bowel/omentum is suspected." }
   ],
   adrenal_kidney_bladder: [
     { id: "hydronephrosis", title: "Hydronephrosis", text: "Hydronephrosis is present." },
