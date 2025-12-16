@@ -16,7 +16,6 @@ type ReportRow = {
   clinical_history: string;
   findings: string;
   impression: string;
-  recommendations: string | null;
 };
 
 export default async function ReportPrintPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,7 +34,7 @@ export default async function ReportPrintPage({ params }: { params: Promise<{ id
 
   const { data: report, error } = await supabase
     .from("reports")
-    .select("patient_name, chart_no, rrn, exam_date, age_text, sex, clinical_history, findings, impression, recommendations")
+    .select("patient_name, chart_no, rrn, exam_date, age_text, sex, clinical_history, findings, impression")
     .eq("id", id)
     .maybeSingle<ReportRow>();
 
@@ -70,13 +69,13 @@ export default async function ReportPrintPage({ params }: { params: Promise<{ id
     examDate,
     clinicalHistory: report.clinical_history,
     findings: report.findings,
-    impression: report.impression,
-    recommendations: report.recommendations ?? ""
-  });
+    impression: report.impression
+  }, { includeTitle: false, includeRecommendations: false });
 
   return (
     <div className="mx-auto max-w-[210mm] print:max-w-none">
       <PrintToolbar />
+      <h1 className="mb-4 text-2xl font-bold tracking-tight print:text-4xl">Ultrasound report</h1>
       <pre className="whitespace-pre-wrap rounded-2xl border border-white/60 bg-white/70 p-6 text-sm leading-6 shadow-sm backdrop-blur print:rounded-none print:border-0 print:bg-white print:p-0 print:shadow-none">
         {text}
       </pre>

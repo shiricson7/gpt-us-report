@@ -94,7 +94,8 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
   const [draftId] = useState(() => (typeof crypto !== "undefined" ? crypto.randomUUID() : uuid()));
 
   const [profile, setProfile] = useState<Profile>(null);
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<null | "save" | "aiAnalyze" | "aiPolish">(null);
+  const busy = busyAction !== null;
   const [status, setStatus] = useState<string | null>(null);
 
   const [patientName, setPatientName] = useState("");
@@ -181,7 +182,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
 
   async function save() {
     setStatus(null);
-    setBusy(true);
+    setBusyAction("save");
     try {
       const {
         data: { user }
@@ -238,7 +239,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
     } catch (err) {
       setStatus(getErrorMessage(err) || "Save failed.");
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -334,7 +335,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
 
   async function aiAnalyzeImages() {
     setStatus(null);
-    setBusy(true);
+    setBusyAction("aiAnalyze");
     try {
       if (!ultrasoundType) throw new Error("Select an ultrasound type first.");
       if (!uploads.length) throw new Error("Upload at least one image first.");
@@ -361,13 +362,13 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
     } catch (err) {
       setStatus(getErrorMessage(err) || "AI request failed.");
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
   async function aiPolish() {
     setStatus(null);
-    setBusy(true);
+    setBusyAction("aiPolish");
     try {
       const res = await fetch("/api/ai/polish", {
         method: "POST",
@@ -387,7 +388,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
     } catch (err) {
       setStatus(getErrorMessage(err) || "AI request failed.");
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -519,7 +520,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
         contextLabel="Image context (optional)"
         contextValue={imageContext}
         onContextChange={setImageContext}
-        actionLabel="AI 이미지 분석"
+        actionLabel={busyAction === "aiAnalyze" ? "로딩중..." : "AI 이미지 분석"}
         actionDisabled={!uploads.length || !ultrasoundType}
         onAction={() => void aiAnalyzeImages()}
       />
@@ -582,7 +583,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
               className="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
               title="Uses OpenAI API"
             >
-              AI 다듬기
+              {busyAction === "aiPolish" ? "로딩중..." : "AI 다듬기"}
             </button>
           </div>
           <textarea
@@ -603,7 +604,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
             className="mt-3 min-h-[220px] w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm outline-none focus:border-slate-400"
             value={impression}
             onChange={(e) => setImpression(e.target.value)}
-            placeholder="Auto-filled and editable."
+            placeholder="진단명만 간단히 입력 (예: Normal study, No focal lesion)."
           />
         </section>
       </div>

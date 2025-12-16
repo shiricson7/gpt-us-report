@@ -43,6 +43,17 @@ function cleanImpression(impression: string, findings: string) {
   return next;
 }
 
+function diagnosisOnly(text: string) {
+  const joined = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join(", ")
+    .trim();
+  return joined.replace(/[.。]+$/g, "").trim();
+}
+
 function redactIdentifiers(text: string) {
   return (
     text
@@ -103,7 +114,10 @@ export async function POST(request: Request) {
     "If laterality is not clear, use side='unknown'. If a lesion is in the isthmus, use side='isthmus'.",
     "For each nodule, estimate size in mm when possible and extract features: composition, echogenicity, shape, margin, echogenic foci.",
     "Assign kTirads category as an integer 1-5 (use 1 when no nodule is seen for that side).",
-    "Generate hospital-grade draft Findings and a brief Impression (1-3 sentences). Impression must not repeat Findings.",
+    "Generate hospital-grade draft Findings and a short Impression.",
+    "Impression must be diagnosis names only (no explanation), very short, preferably 1 line.",
+    "Separate multiple diagnoses with commas. Do NOT write full sentences.",
+    "Impression must not repeat Findings.",
     "Formatting requirement: after every '.' end the sentence and start a new line. Use blank lines to separate paragraphs when helpful.",
     "Do not include any patient identifiers.",
     "Return ONLY valid JSON with keys: imageAssignments, nodules, findings, impression.",
@@ -158,7 +172,7 @@ export async function POST(request: Request) {
 
     const findings = formatReportText(String(parsed.findings ?? ""));
     const impressionRaw = String(parsed.impression ?? "").trim();
-    const impression = formatReportText(cleanImpression(impressionRaw, findings));
+    const impression = diagnosisOnly(cleanImpression(impressionRaw, findings));
 
     const imageAssignments = Array.isArray(parsed.imageAssignments)
       ? (parsed.imageAssignments as Array<{ filename?: unknown; side?: unknown }>).map((a) => ({

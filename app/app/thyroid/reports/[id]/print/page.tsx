@@ -15,7 +15,6 @@ type ReportRow = {
   clinical_info: string;
   findings: string;
   impression: string;
-  recommendations: string;
 };
 
 export default async function ThyroidReportPrintPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +33,7 @@ export default async function ThyroidReportPrintPage({ params }: { params: Promi
 
   const { data: report, error } = await supabase
     .from("thyroid_reports")
-    .select("patient_name, chart_no, rrn, exam_date, age_text, sex, clinical_info, findings, impression, recommendations")
+    .select("patient_name, chart_no, rrn, exam_date, age_text, sex, clinical_info, findings, impression")
     .eq("id", id)
     .maybeSingle<ReportRow>();
 
@@ -57,7 +56,6 @@ export default async function ThyroidReportPrintPage({ params }: { params: Promi
   }
 
   const headerLines = [
-    "Thyroid ultrasound report",
     profile?.hospital_name ? profile.hospital_name : "",
     "",
     `Patient: ${report.patient_name}`,
@@ -79,9 +77,6 @@ export default async function ThyroidReportPrintPage({ params }: { params: Promi
     "Impression",
     report.impression.trim(),
     "",
-    "K-TIRADS recommendations",
-    report.recommendations.trim(),
-    "",
     profile?.doctor_name || profile?.license_no
       ? `Signed: ${[profile?.doctor_name, profile?.license_no].filter(Boolean).join(" / ")}`
       : ""
@@ -92,6 +87,7 @@ export default async function ThyroidReportPrintPage({ params }: { params: Promi
   return (
     <div className="mx-auto max-w-[210mm] print:max-w-none">
       <PrintToolbar />
+      <h1 className="mb-4 text-2xl font-bold tracking-tight print:text-4xl">Thyroid ultrasound report</h1>
       <pre className="whitespace-pre-wrap rounded-2xl border border-white/60 bg-white/70 p-6 text-sm leading-6 shadow-sm backdrop-blur print:rounded-none print:border-0 print:bg-white print:p-0 print:shadow-none">
         {text}
       </pre>

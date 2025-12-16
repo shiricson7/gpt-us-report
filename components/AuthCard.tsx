@@ -20,10 +20,13 @@ export default function AuthCard() {
     setError(null);
     setStatus(null);
     setBusy(true);
+    let didNavigate = false;
     try {
       if (mode === "signin") {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
+        setStatus("로딩중...");
+        didNavigate = true;
         router.push("/app");
         router.refresh();
       } else {
@@ -34,13 +37,15 @@ export default function AuthCard() {
           setMode("signin");
           return;
         }
+        setStatus("로딩중...");
+        didNavigate = true;
         router.push("/app");
         router.refresh();
       }
     } catch (err) {
       setError(getErrorMessage(err) || "Authentication failed.");
     } finally {
-      setBusy(false);
+      if (!didNavigate) setBusy(false);
     }
   }
 
@@ -93,8 +98,9 @@ export default function AuthCard() {
           type="submit"
           disabled={busy}
         >
-          {busy ? "Please wait..." : mode === "signin" ? "Sign in" : "Create account"}
+          {busy ? "로딩중..." : mode === "signin" ? "Sign in" : "Create account"}
         </button>
+        {busy ? <p className="text-xs text-slate-600">로딩중입니다…</p> : null}
       </form>
     </div>
   );

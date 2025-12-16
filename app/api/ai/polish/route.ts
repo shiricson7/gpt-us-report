@@ -47,6 +47,17 @@ function cleanImpression(impression: string, findings: string) {
   return next;
 }
 
+function diagnosisOnly(text: string) {
+  const joined = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join(", ")
+    .trim();
+  return joined.replace(/[.。]+$/g, "").trim();
+}
+
 function redactIdentifiers(text: string) {
   return (
     text
@@ -90,9 +101,11 @@ export async function POST(request: Request) {
     "You are a board-certified radiologist.",
     "Rewrite the provided ultrasound Findings into a polished radiology-style report.",
     "Also produce a concise Impression consistent with the Findings and Clinical history.",
-    "Impression must NOT repeat the Findings; it should be a brief conclusion (1–3 sentences).",
+    "Impression must be diagnosis names only (no explanation), very short, preferably 1 line.",
+    "Separate multiple diagnoses with commas. Do NOT write full sentences.",
+    "Impression must NOT repeat the Findings.",
     "Use professional medical terminology and plain sentences.",
-    "Do NOT use special symbols or bullets (no '-', '*', '•', '#', ':', ';').",
+    "Do NOT use bullets (no '-', '*', '•').",
     "Do NOT add patient identifiers.",
     "Return ONLY valid JSON with keys: findings, impression."
   ].join("\n");
@@ -135,7 +148,7 @@ export async function POST(request: Request) {
     const parsed = JSON.parse(content) as { findings?: string; impression?: string };
     const nextFindings = String(parsed.findings ?? findings).trim() || findings;
     const rawImpression = String(parsed.impression ?? "").trim();
-    const nextImpression = cleanImpression(rawImpression, nextFindings) || impression;
+    const nextImpression = diagnosisOnly(cleanImpression(rawImpression, nextFindings)) || impression;
 
     return NextResponse.json({ findings: nextFindings, impression: nextImpression });
   } catch {

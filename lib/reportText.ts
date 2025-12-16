@@ -14,9 +14,20 @@ export type ReportForText = {
   recommendations?: string;
 };
 
-export function buildPlainTextReport(r: ReportForText) {
-  const lines = [
-    "Ultrasound report",
+export type PlainTextReportOptions = {
+  includeTitle?: boolean;
+  includeRecommendations?: boolean;
+  title?: string;
+};
+
+export function buildPlainTextReport(r: ReportForText, opts: PlainTextReportOptions = {}) {
+  const includeTitle = opts.includeTitle ?? true;
+  const includeRecommendations = opts.includeRecommendations ?? true;
+  const title = opts.title ?? "Ultrasound report";
+
+  const lines: string[] = [];
+  if (includeTitle) lines.push(title);
+  lines.push(
     r.hospitalName ? r.hospitalName : "",
     "",
     `Patient: ${r.patientName}`,
@@ -32,13 +43,18 @@ export function buildPlainTextReport(r: ReportForText) {
     r.findings || "",
     "",
     "Impression",
-    r.impression || "",
-    "",
-    "Recommendations",
-    r.recommendations || "",
+    r.impression || ""
+  );
+
+  if (includeRecommendations) {
+    lines.push("", "Recommendations", r.recommendations || "");
+  }
+
+  lines.push(
     "",
     r.doctorName || r.licenseNo ? `Signed: ${[r.doctorName, r.licenseNo].filter(Boolean).join(" / ")}` : ""
-  ].filter((l, idx, arr) => !(l === "" && arr[idx - 1] === "")); // collapse repeated blanks
+  );
 
-  return lines.join("\n").trim() + "\n";
+  const collapsed = lines.filter((l, idx, arr) => !(l === "" && arr[idx - 1] === "")); // collapse repeated blanks
+  return collapsed.join("\n").trim() + "\n";
 }

@@ -44,6 +44,17 @@ function cleanImpression(impression: string, findings: string) {
   return next;
 }
 
+function diagnosisOnly(text: string) {
+  const joined = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join(", ")
+    .trim();
+  return joined.replace(/[.。]+$/g, "").trim();
+}
+
 function redactIdentifiers(text: string) {
   return (
     text
@@ -107,7 +118,9 @@ export async function POST(request: Request) {
     "Analyze the provided ultrasound images in the context of the ultrasound type and clinical history.",
     "Write a hospital-grade radiology report: concise, high-signal, and sectioned into short paragraphs.",
     "Findings should be professional and focused on the key sonographic observations.",
-    "Impression must NOT repeat the Findings; it should be a brief conclusion (1-2 sentences).",
+    "Impression must be diagnosis names only (no explanation), very short, preferably 1 line.",
+    "Separate multiple diagnoses with commas. Do NOT write full sentences.",
+    "Impression must NOT repeat the Findings.",
     "Recommendations should be practical and conservative, based on the Impression.",
     "Write Recommendations primarily in Korean; medical terminology may remain in English.",
     "Formatting requirement: after every '.' end the sentence and start a new line. Use blank lines to separate paragraphs when helpful.",
@@ -158,7 +171,7 @@ export async function POST(request: Request) {
 
     const findings = formatReportText(String(parsed.findings ?? ""));
     const impressionRaw = String(parsed.impression ?? "").trim();
-    const impression = formatReportText(cleanImpression(impressionRaw, findings));
+    const impression = diagnosisOnly(cleanImpression(impressionRaw, findings));
     const recommendations = formatReportText(String(parsed.recommendations ?? ""));
 
     return NextResponse.json({ findings, impression, recommendations });

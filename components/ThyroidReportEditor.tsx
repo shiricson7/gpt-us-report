@@ -155,7 +155,8 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
   const [draftId] = useState(() => (typeof crypto !== "undefined" ? crypto.randomUUID() : uuid()));
 
   const [profile, setProfile] = useState<Profile>(null);
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<null | "save" | "aiAnalyze">(null);
+  const busy = busyAction !== null;
   const [status, setStatus] = useState<string | null>(null);
 
   const [patientName, setPatientName] = useState("");
@@ -370,7 +371,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
 
   async function analyzeWithAi() {
     setStatus(null);
-    setBusy(true);
+    setBusyAction("aiAnalyze");
     try {
       if (!uploads.length) throw new Error("?대?吏瑜??낅줈?쒗빐 二쇱꽭??");
 
@@ -443,13 +444,13 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     } catch (err) {
       setStatus(getErrorMessage(err));
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
   async function save() {
     setStatus(null);
-    setBusy(true);
+    setBusyAction("save");
     try {
       const {
         data: { user }
@@ -509,7 +510,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     } catch (err) {
       setStatus(getErrorMessage(err) || "Save failed.");
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -647,7 +648,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
             contextLabel="Image context (optional)"
             contextValue={imageContext}
             onContextChange={setImageContext}
-            actionLabel="Analyze with AI"
+            actionLabel={busyAction === "aiAnalyze" ? "로딩중..." : "Analyze with AI"}
             actionDisabled={!uploads.length}
             onAction={() => void analyzeWithAi()}
           />
@@ -759,7 +760,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
             className="mt-3 min-h-[260px] w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm outline-none focus:border-slate-400"
             value={impression}
             onChange={(e) => setImpression(e.target.value)}
-            placeholder="AI will fill this after analysis."
+            placeholder="진단명만 간단히 (예: Benign-appearing thyroid nodules, No suspicious nodule)."
           />
         </section>
       </div>
