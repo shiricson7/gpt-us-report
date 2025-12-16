@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -137,7 +137,7 @@ function computeRecommendations(nodules: KtiradsNodule[]) {
   for (const n of nodules) {
     if (!n.kTirads) continue;
     const sizeMm = typeof n.sizeMm === "number" && Number.isFinite(n.sizeMm) ? n.sizeMm : null;
-    const sideKo = n.side === "left" ? "좌엽" : n.side === "right" ? "우엽" : n.side === "isthmus" ? "협부" : "미상";
+    const sideKo = n.side === "left" ? "좌엽" : n.side === "right" ? "우엽" : n.side === "isthmus" ? "협부" : "불명";
     const prefix = `${sideKo}${n.location ? `(${n.location})` : ""}${sizeMm ? ` ${formatSize(sizeMm)}` : ""}`;
     lines.push(`${prefix}: ${recommendKtiradsManagement({ kTirads: n.kTirads, sizeMm })}`);
   }
@@ -314,17 +314,17 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
 
       const isDicom = ext === "dcm" || file.type.toLowerCase().includes("dicom");
       if (isDicom) {
-        setStatus("DICOM(.dcm)은 아직 미지원입니다. PNG/JPG로 내보내서 업로드해 주세요.");
+        setStatus("DICOM(.dcm)? ?꾩쭅 誘몄??먯엯?덈떎. PNG/JPG濡??대낫?댁꽌 ?낅줈?쒗빐 二쇱꽭??");
         continue;
       }
 
       if (!file.type.startsWith("image/")) {
-        setStatus("이미지 파일(PNG/JPG/WebP)만 지원합니다.");
+        setStatus("?대?吏 ?뚯씪(PNG/JPG/WebP)留?吏?먰빀?덈떎.");
         continue;
       }
 
       if (file.size > 12 * 1024 * 1024) {
-        setStatus("파일이 너무 큽니다. 12MB 이하로 업로드해 주세요.");
+        setStatus("?뚯씪???덈Т ?쎈땲?? 12MB ?댄븯濡??낅줈?쒗빐 二쇱꽭??");
         continue;
       }
 
@@ -372,7 +372,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     setStatus(null);
     setBusy(true);
     try {
-      if (!uploads.length) throw new Error("이미지를 업로드해 주세요.");
+      if (!uploads.length) throw new Error("?대?吏瑜??낅줈?쒗빐 二쇱꽭??");
 
       const imagePaths = await ensureUploadedImagePaths();
 
@@ -439,7 +439,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
       setAnalysis(nextAnalysis);
       if (nextAnalysis.findings) setFindings(nextAnalysis.findings);
       if (nextAnalysis.impression) setImpression(nextAnalysis.impression);
-      setStatus("AI 분석이 완료되었습니다. 결과를 검토해 주세요.");
+      setStatus("AI 遺꾩꽍???꾨즺?섏뿀?듬땲?? 寃곌낵瑜?寃?좏빐 二쇱꽭??");
     } catch (err) {
       setStatus(getErrorMessage(err));
     } finally {
@@ -557,7 +557,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
       <div className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur">
         <h1 className="text-lg font-semibold">{reportId ? "Edit thyroid report" : "New thyroid report"}</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Upload thyroid ultrasound images → auto K-TIRADS structuring → draft findings/impression → save/print.
+          Upload thyroid ultrasound images ??auto K-TIRADS structuring ??draft findings/impression ??save/print.
         </p>
       </div>
 
@@ -582,7 +582,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
               />
             </label>
             <label className="grid gap-1 text-xs font-medium text-slate-700">
-              주민등록번호 (RRN)
+              二쇰??깅줉踰덊샇 (RRN)
               <input
                 className="h-10 rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none focus:border-slate-400"
                 value={rrn}
@@ -635,7 +635,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
         <div className="grid gap-3">
           <ImageUploadWithContext
             title="Thyroid ultrasound images"
-            helpText="이미지 + 간단한 설명을 바탕으로 AI가 K-TIRADS 분류와 findings/impression 초안을 작성합니다."
+            helpText="?대?吏 + 媛꾨떒???ㅻ챸??諛뷀깢?쇰줈 AI媛 K-TIRADS 遺꾨쪟? findings/impression 珥덉븞???묒꽦?⑸땲??"
             busy={busy}
             uploads={uploads}
             accept="image/png,image/jpeg,image/webp,.dcm"
@@ -671,7 +671,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
 
         <section className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur">
           <h2 className="text-sm font-semibold">K-TIRADS (auto)</h2>
-          <p className="mt-1 text-xs text-slate-600">AI가 병변을 좌/우/협부로 분류하고 K-TIRADS로 정리합니다.</p>
+          <p className="mt-1 text-xs text-slate-600">AI媛 蹂묐???醫????묐?濡?遺꾨쪟?섍퀬 K-TIRADS濡??뺣━?⑸땲??</p>
 
           <div className="mt-4 grid gap-4">
             <div className="text-xs font-semibold text-slate-700">Highest: {highestKtirads ? `K-TIRADS ${highestKtirads}` : "—"}</div>
@@ -802,3 +802,5 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Body = {
@@ -18,7 +18,7 @@ function normalizeComparable(text: string) {
 }
 
 function extractAfterLastHeader(text: string, header: string) {
-  const re = new RegExp(`\\b${header}\\b\\s*[:\\-–—]?\\s*`, "gi");
+  const re = new RegExp(`\\b${header}\\b\\s*[:\\-\\s]*`, "gi");
   let match: RegExpExecArray | null = null;
   let last: RegExpExecArray | null = null;
   while ((match = re.exec(text))) last = match;
@@ -31,7 +31,7 @@ function cleanImpression(impression: string, findings: string) {
   if (!next) return "";
 
   next = extractAfterLastHeader(next, "impression");
-  next = next.replace(/^\s*findings\s*[:\\-–—]?\s*/i, "").trim();
+  next = next.replace(/^\\s*findings\\s*[:\\-\\s]*/i, "").trim();
 
   const nf = normalizeComparable(findings);
   const ni = normalizeComparable(next);
@@ -52,6 +52,15 @@ function redactIdentifiers(text: string) {
       // Long digit sequences (chart numbers, phone numbers, etc.)
       .replace(/\b\d{8,}\b/g, "[REDACTED]")
   );
+}
+
+function formatReportText(text: string) {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\. +/g, ".\n")
+    .replace(/。\s+/g, "。\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 export async function POST(request: Request) {
@@ -96,10 +105,12 @@ export async function POST(request: Request) {
   const system = [
     "You are a board-certified radiologist.",
     "Analyze the provided ultrasound images in the context of the ultrasound type and clinical history.",
-    "Write professional radiology-style Findings and a concise Impression consistent with the images and clinical history.",
-    "Also provide Recommendations/plan based on the Impression (follow-up, additional imaging, referral, etc.).",
-    "Impression must NOT repeat the Findings; it should be a brief conclusion (1–3 sentences).",
-    "Use professional medical terminology and plain sentences.",
+    "Write a hospital-grade radiology report: concise, high-signal, and sectioned into short paragraphs.",
+    "Findings should be professional and focused on the key sonographic observations.",
+    "Impression must NOT repeat the Findings; it should be a brief conclusion (1-2 sentences).",
+    "Recommendations should be practical and conservative, based on the Impression.",
+    "Write Recommendations primarily in Korean; medical terminology may remain in English.",
+    "Formatting requirement: after every '.' end the sentence and start a new line. Use blank lines to separate paragraphs when helpful.",
     "Do NOT add patient identifiers.",
     "Return ONLY valid JSON with keys: findings, impression, recommendations."
   ].join("\n");
@@ -145,13 +156,15 @@ export async function POST(request: Request) {
   try {
     const parsed = JSON.parse(raw) as { findings?: unknown; impression?: unknown; recommendations?: unknown };
 
-    const findings = String(parsed.findings ?? "").trim();
+    const findings = formatReportText(String(parsed.findings ?? ""));
     const impressionRaw = String(parsed.impression ?? "").trim();
-    const impression = cleanImpression(impressionRaw, findings);
-    const recommendations = String(parsed.recommendations ?? "").trim();
+    const impression = formatReportText(cleanImpression(impressionRaw, findings));
+    const recommendations = formatReportText(String(parsed.recommendations ?? ""));
 
     return NextResponse.json({ findings, impression, recommendations });
   } catch {
     return new NextResponse("OpenAI returned non-JSON output", { status: 502 });
   }
 }
+
+

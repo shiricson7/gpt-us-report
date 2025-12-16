@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Body = {
@@ -17,7 +17,7 @@ function normalizeComparable(text: string) {
 }
 
 function extractAfterLastHeader(text: string, header: string) {
-  const re = new RegExp(`\\b${header}\\b\\s*[:\\-–—]?\\s*`, "gi");
+  const re = new RegExp(`\\b${header}\\b\\s*[:\\-\\s]*`, "gi");
   let match: RegExpExecArray | null = null;
   let last: RegExpExecArray | null = null;
   while ((match = re.exec(text))) last = match;
@@ -30,7 +30,7 @@ function cleanImpression(impression: string, findings: string) {
   if (!next) return "";
 
   next = extractAfterLastHeader(next, "impression");
-  next = next.replace(/^\s*findings\s*[:\\-–—]?\s*/i, "").trim();
+  next = next.replace(/^\\s*findings\\s*[:\\-\\s]*/i, "").trim();
 
   const nf = normalizeComparable(findings);
   const ni = normalizeComparable(next);
@@ -49,6 +49,15 @@ function redactIdentifiers(text: string) {
       .replace(/\b\d{6}-\d{7}\b/g, "[REDACTED]")
       .replace(/\b\d{8,}\b/g, "[REDACTED]")
   );
+}
+
+function formatReportText(text: string) {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\. +/g, ".\n")
+    .replace(/。\s+/g, "。\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 export async function POST(request: Request) {
@@ -94,7 +103,8 @@ export async function POST(request: Request) {
     "If laterality is not clear, use side='unknown'. If a lesion is in the isthmus, use side='isthmus'.",
     "For each nodule, estimate size in mm when possible and extract features: composition, echogenicity, shape, margin, echogenic foci.",
     "Assign kTirads category as an integer 1-5 (use 1 when no nodule is seen for that side).",
-    "Generate professional draft Findings and a brief Impression (1-3 sentences). Impression must not repeat Findings.",
+    "Generate hospital-grade draft Findings and a brief Impression (1-3 sentences). Impression must not repeat Findings.",
+    "Formatting requirement: after every '.' end the sentence and start a new line. Use blank lines to separate paragraphs when helpful.",
     "Do not include any patient identifiers.",
     "Return ONLY valid JSON with keys: imageAssignments, nodules, findings, impression.",
     "imageAssignments is an array of { filename, side } where side is one of left|right|isthmus|unknown.",
@@ -146,9 +156,9 @@ export async function POST(request: Request) {
       impression?: unknown;
     };
 
-    const findings = String(parsed.findings ?? "").trim();
+    const findings = formatReportText(String(parsed.findings ?? ""));
     const impressionRaw = String(parsed.impression ?? "").trim();
-    const impression = cleanImpression(impressionRaw, findings);
+    const impression = formatReportText(cleanImpression(impressionRaw, findings));
 
     const imageAssignments = Array.isArray(parsed.imageAssignments)
       ? (parsed.imageAssignments as Array<{ filename?: unknown; side?: unknown }>).map((a) => ({
@@ -169,3 +179,5 @@ export async function POST(request: Request) {
     return new NextResponse("OpenAI returned non-JSON output", { status: 502 });
   }
 }
+
+
