@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
 
 type UploadItem = {
@@ -35,7 +35,7 @@ export default function ImageUploadWithContext(props: {
   busy: boolean;
   uploads: UploadItem[];
   accept: string;
-  onPickFiles: (files: FileList | null) => void;
+  onPickFiles: (files: FileList | File[] | null) => void;
   onRemoveUpload: (id: string) => void;
   renderMeta?: (upload: UploadItem) => ReactNode;
   contextLabel: string;
@@ -47,6 +47,46 @@ export default function ImageUploadWithContext(props: {
   onAction: () => void;
 }) {
   const inputId = useId();
+  const busyRef = useRef(props.busy);
+  const uploadsCountRef = useRef(props.uploads.length);
+  const onPickFilesRef = useRef(props.onPickFiles);
+
+  useEffect(() => {
+    busyRef.current = props.busy;
+  }, [props.busy]);
+
+  useEffect(() => {
+    uploadsCountRef.current = props.uploads.length;
+  }, [props.uploads.length]);
+
+  useEffect(() => {
+    onPickFilesRef.current = props.onPickFiles;
+  }, [props.onPickFiles]);
+
+  useEffect(() => {
+    function handlePaste(event: ClipboardEvent) {
+      if (busyRef.current) return;
+      if (uploadsCountRef.current >= 12) return;
+
+      const items = Array.from(event.clipboardData?.items ?? []);
+      if (!items.length) return;
+
+      const files = items
+        .filter((item) => item.kind === "file")
+        .map((item) => item.getAsFile())
+        .filter((file): file is File => !!file)
+        .filter((file) => file.type.startsWith("image/"));
+
+      if (!files.length) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onPickFilesRef.current(files);
+    }
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, []);
 
   return (
     <section className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur">
@@ -76,7 +116,7 @@ export default function ImageUploadWithContext(props: {
               <UploadIcon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold text-slate-900">Click to add images</div>
+              <div className="text-sm font-semibold text-slate-900">클릭하거나 붙여넣기(⌘V/Ctrl+V)로 이미지 추가</div>
               <div className="mt-1 text-xs text-slate-600">
                 PNG/JPG/WebP 권장 (DICOM은 현재 미지원). 최대 12장.
               </div>

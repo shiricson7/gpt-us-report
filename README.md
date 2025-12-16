@@ -13,4 +13,4 @@ Pediatric ultrasound reporting web app (Next.js + React + Supabase) with an AI-a
 
 ## Notes
 - Landing background expects `public/landing.mp4` (ChatGPT Sora video). Add your own file at that path.
-
+- Image upload supports clipboard paste (⌘V/Ctrl+V) in the editor.

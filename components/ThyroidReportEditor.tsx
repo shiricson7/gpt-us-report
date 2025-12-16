@@ -304,7 +304,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     };
   }, [supabase, reportId]);
 
-  async function onFilesSelected(files: FileList | null) {
+  async function onFilesSelected(files: FileList | File[] | null) {
     setStatus(null);
     if (!files || !files.length) return;
 
@@ -640,7 +640,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
             busy={busy}
             uploads={uploads}
             accept="image/png,image/jpeg,image/webp,.dcm"
-            onPickFiles={(files) => void onFilesSelected(files)}
+            onPickFiles={onFilesSelected}
             onRemoveUpload={(id) => setUploads((prev) => prev.filter((p) => p.id !== id))}
             renderMeta={(u) => (
               <span>Side: {assignments.get(u.filename) ? sideLabel(assignments.get(u.filename)!) : "—"}</span>
@@ -803,5 +803,4 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
     </div>
   );
 }
-
 

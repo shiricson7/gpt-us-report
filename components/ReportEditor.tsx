@@ -268,7 +268,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
     }
   }
 
-  async function onFilesSelected(files: FileList | null) {
+  async function onFilesSelected(files: FileList | File[] | null) {
     setStatus(null);
     if (!files || !files.length) return;
 
@@ -515,7 +515,7 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
         busy={busy}
         uploads={uploads}
         accept="image/png,image/jpeg,image/webp,.dcm"
-        onPickFiles={(files) => void onFilesSelected(files)}
+        onPickFiles={onFilesSelected}
         onRemoveUpload={(id) => setUploads((prev) => prev.filter((p) => p.id !== id))}
         contextLabel="Image context (optional)"
         contextValue={imageContext}
