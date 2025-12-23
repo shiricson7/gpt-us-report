@@ -118,6 +118,7 @@ export async function POST(request: Request) {
     "Analyze the provided ultrasound images in the context of the ultrasound type and clinical history.",
     "Write a hospital-grade radiology report: concise, high-signal, and sectioned into short paragraphs.",
     "Findings should be professional and focused on the key sonographic observations.",
+    "Findings and Impression must be in English only.",
     "Impression must be diagnosis names only (no explanation), very short, preferably 1 line.",
     "Separate multiple diagnoses with commas. Do NOT write full sentences.",
     "Impression must NOT repeat the Findings.",

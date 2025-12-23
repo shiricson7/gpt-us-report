@@ -115,6 +115,7 @@ export async function POST(request: Request) {
     "For each nodule, estimate size in mm when possible and extract features: composition, echogenicity, shape, margin, echogenic foci.",
     "Assign kTirads category as an integer 1-5 (use 1 when no nodule is seen for that side).",
     "Generate hospital-grade draft Findings and a short Impression.",
+    "Findings and Impression must be in English only.",
     "Impression must be diagnosis names only (no explanation), very short, preferably 1 line.",
     "Separate multiple diagnoses with commas. Do NOT write full sentences.",
     "Impression must not repeat Findings.",
