@@ -583,7 +583,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
               />
             </label>
             <label className="grid gap-1 text-xs font-medium text-slate-700">
-              二쇰??깅줉踰덊샇 (RRN)
+              주민등록번호 (RRN)
               <input
                 className="h-10 rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none focus:border-slate-400"
                 value={rrn}
@@ -636,7 +636,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
         <div className="grid gap-3">
           <ImageUploadWithContext
             title="Thyroid ultrasound images"
-            helpText="?대?吏 + 媛꾨떒???ㅻ챸??諛뷀깢?쇰줈 AI媛 K-TIRADS 遺꾨쪟? findings/impression 珥덉븞???묒꽦?⑸땲??"
+            helpText="이미지 + 간단한 설명을 바탕으로 AI가 K-TIRADS 분류와 findings/impression 초안을 생성합니다."
             busy={busy}
             uploads={uploads}
             accept="image/png,image/jpeg,image/webp,.dcm"
@@ -672,7 +672,7 @@ export default function ThyroidReportEditor({ reportId }: { reportId?: string })
 
         <section className="rounded-2xl border border-white/60 bg-white/70 p-6 shadow-sm backdrop-blur">
           <h2 className="text-sm font-semibold">K-TIRADS (auto)</h2>
-          <p className="mt-1 text-xs text-slate-600">AI媛 蹂묐???醫????묐?濡?遺꾨쪟?섍퀬 K-TIRADS濡??뺣━?⑸땲??</p>
+          <p className="mt-1 text-xs text-slate-600">AI가 병변을 분류하고 K-TIRADS로 정리합니다.</p>
 
           <div className="mt-4 grid gap-4">
             <div className="text-xs font-semibold text-slate-700">Highest: {highestKtirads ? `K-TIRADS ${highestKtirads}` : "—"}</div>

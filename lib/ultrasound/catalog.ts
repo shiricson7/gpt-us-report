@@ -5,6 +5,7 @@ export type UltrasoundType =
   | "limited"
   | "neonate_spine"
   | "neonate_brain"
+  | "neonate_ddh"
   | "neck"
   | "thyroid"
   | "female_pelvis"
@@ -19,6 +20,7 @@ export const ULTRASOUND_TYPES: Array<{ value: UltrasoundType; label: string }> =
   { value: "limited", label: "단순초음파" },
   { value: "neonate_spine", label: "신생아 척수초음파" },
   { value: "neonate_brain", label: "신생아 뇌초음파" },
+  { value: "neonate_ddh", label: "신생아 DDH 초음파" },
   { value: "neck", label: "경부 초음파" },
   { value: "thyroid", label: "갑상선 초음파" },
   { value: "female_pelvis", label: "여성 생식기 (난소, 자궁) 초음파" },
@@ -42,6 +44,8 @@ const normalFindingsByType: Record<UltrasoundType, string> = {
     "Conus medullaris terminates at an appropriate level. Filum terminale not thickened. Central canal not dilated. No intraspinal mass or dermal sinus tract. No evidence of tethering on this exam.",
   neonate_brain:
     "Ventricular size within normal limits. No germinal matrix/intraventricular hemorrhage. No periventricular echogenicity to suggest leukomalacia. Midline structures are intact. No extra-axial fluid collection.",
+  neonate_ddh:
+    "Both femoral heads are well seated within the acetabula with symmetric coverage. No subluxation or dislocation. No joint effusion.",
   neck:
     "No suspicious cervical mass. Thyroid bed and major salivary glands appear unremarkable on this limited neck assessment. No pathologic lymphadenopathy. No focal fluid collection.",
   thyroid:
@@ -63,6 +67,7 @@ const defaultImpressionByType: Record<UltrasoundType, string> = {
   limited: "No focal abnormality identified on this limited ultrasound exam.",
   neonate_spine: "No sonographic evidence of spinal dysraphism or tethered cord on this exam.",
   neonate_brain: "No sonographic evidence of intracranial hemorrhage or ventriculomegaly on this exam.",
+  neonate_ddh: "No sonographic evidence of developmental dysplasia of the hip on this exam.",
   neck: "No focal neck abnormality identified on this exam.",
   thyroid: "Unremarkable thyroid ultrasound.",
   female_pelvis: "Unremarkable pelvic ultrasound.",
@@ -125,6 +130,13 @@ const abnormalTilesByType: Record<UltrasoundType, AbnormalTile[]> = {
     { id: "extra_axial", title: "Extra-axial fluid", text: "Extra-axial fluid collection is present." },
     { id: "midline", title: "Midline abnormality", text: "Midline abnormality is suspected; consider MRI if clinically indicated." },
     { id: "calc", title: "Calcifications", text: "Intracranial calcifications are noted." }
+  ],
+  neonate_ddh: [
+    { id: "subluxation", title: "Subluxation", text: "Femoral head appears subluxed on dynamic assessment." },
+    { id: "dislocation", title: "Dislocation", text: "Femoral head is dislocated from the acetabulum." },
+    { id: "shallow_acetabulum", title: "Shallow acetabulum", text: "Acetabular coverage appears shallow for age." },
+    { id: "asymmetry", title: "Asymmetric coverage", text: "Asymmetric acetabular coverage is noted between hips." },
+    { id: "effusion", title: "Joint effusion", text: "Hip joint effusion is present." },
   ],
   neck: [
     { id: "reactive_nodes", title: "Reactive nodes", text: "Multiple benign-appearing reactive lymph nodes are noted." },
