@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import PrintToolbar from "@/components/PrintToolbar";
+import GuardianGuide from "@/components/GuardianGuide";
 
 const reportSans = Source_Sans_3({
   subsets: ["latin"],
@@ -138,6 +139,8 @@ export default async function ReportPrintPage({ params }: { params: Promise<{ id
             <div className="mt-3 whitespace-pre-wrap text-[15px] leading-7">{(report.impression || "").trim()}</div>
           </section>
         </div>
+
+        <GuardianGuide findings={report.findings} impression={report.impression} />
 
         {profile?.doctor_name || profile?.license_no ? (
           <div className="mt-10 border-t border-slate-200 pt-4 text-sm print:border-slate-300">
