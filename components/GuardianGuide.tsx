@@ -2,7 +2,7 @@ import { Gaegu } from "next/font/google";
 import { buildGuardianGuide } from "@/lib/guardianGuide";
 
 const guideFont = Gaegu({
-  subsets: ["latin", "korean"],
+  subsets: ["latin"],
   weight: ["400", "700"],
   display: "swap"
 });

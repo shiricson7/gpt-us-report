@@ -2,13 +2,13 @@ import { Gaegu, Gowun_Dodum } from "next/font/google";
 import type { GuardianSummary } from "@/lib/guardianSummary";
 
 const titleFont = Gaegu({
-  subsets: ["latin", "korean"],
+  subsets: ["latin"],
   weight: ["400", "700"],
   display: "swap"
 });
 
 const bodyFont = Gowun_Dodum({
-  subsets: ["latin", "korean"],
+  subsets: ["latin"],
   weight: ["400"],
   display: "swap"
 });
