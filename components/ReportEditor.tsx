@@ -644,6 +644,14 @@ export default function ReportEditor({ reportId }: { reportId?: string }) {
           >
             Print A4
           </button>
+          <button
+            type="button"
+            disabled={!reportId}
+            onClick={() => window.open(`/app/reports/${reportId}/guardian-print`, "_blank")}
+            className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50"
+          >
+            보호자용 출력물
+          </button>
           {status ? <p className="text-sm text-slate-700">{status}</p> : null}
         </div>
       </section>
